@@ -20,4 +20,20 @@ public class PaymentRequest {
     @NotBlank
     @Pattern(regexp = "^[0-9]{4}$")
     private String cardExpiryDate; // YYMM format
+
+    public Object getAmount() {
+        return amount;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public String getCardExpiryDate() {
+        return cardExpiryDate;
+    }
+
+    public String getMerchantId() {
+        return merchantId;
+    }
 }

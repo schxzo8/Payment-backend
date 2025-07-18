@@ -1,5 +1,6 @@
 package com.paymentapp.security;
 
+import ch.qos.logback.classic.Logger;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -33,7 +34,7 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parser()
                 .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
@@ -43,8 +44,9 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String authToken) {
+        Logger logger = null;
         try {
-            Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(getSignInKey()).build().parseClaimsJws(authToken);
             return true;
         } catch (MalformedJwtException ex) {
             logger.error("Invalid JWT token");

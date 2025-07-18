@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -30,34 +31,38 @@ public class AuthService {
         this.merchantRepository = merchantRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
-
-        // Create hardcoded merchant user
-        createHardcodedMerchant();
     }
 
-    public LoginResponse authenticateUser(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        return new LoginResponse(jwt);
-    }
-
-    private void createHardcodedMerchant() {
-        if (!merchantRepository.existsByEmail("merchant")) {
+    @Transactional
+    public void createHardcodedMerchant() {
+        if (merchantRepository.findByEmail("merchant").isEmpty()) {
             Merchant merchant = new Merchant();
             merchant.setMerchantName("Default Merchant");
             merchant.setMerchantId("MERCHANT123");
             merchant.setEmail("merchant");
             merchant.setPhoneNo("1234567890");
             merchant.setPassword(passwordEncoder.encode("pay123"));
-
             merchantRepository.save(merchant);
+        }
+    }
+
+    public LoginResponse authenticateUser(LoginRequest loginRequest) {
+        try {
+            // Initialize the hardcoded merchant if not exists
+            createHardcodedMerchant();
+
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = tokenProvider.generateToken(authentication);
+            return new LoginResponse(jwt);
+        } catch (Exception e) {
+            throw new AppException("Invalid username or password");
         }
     }
 }

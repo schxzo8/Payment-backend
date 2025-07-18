@@ -5,9 +5,12 @@ import lombok.Data;
 @Data
 public class LoginResponse {
     private String accessToken;
-    private String tokenType = "Bearer";
+    private String tokenType = "Bearer";  // Fixed typo from "Bearen" to "Bearer"
 
     public LoginResponse(String accessToken) {
         this.accessToken = accessToken;
     }
+
+    // No-args constructor for JSON deserialization
+    public LoginResponse() {}
 }
