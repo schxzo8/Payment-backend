@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -24,10 +25,10 @@ public class Transaction {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    private String cardNumber; // Will be masked before storage
+    private String cardNumber;
 
     @Column(nullable = false)
-    private String cardExpiryDate; // Format: YYMM
+    private String cardExpiryDate;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
@@ -35,61 +36,19 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionStatus status;
-    private TransactionStatus transactionStatus;
 
-    public Object getTransactionId() {
-        return transactionId;
-    }
 
-    public Merchant getMerchant() {
-        return merchant;
-    }
-
-    public Object getAmount() {
-        return amount;
-    }
-
-    public Object getCardNumber() {
-        return cardNumber;
-    }
-
-    public Object getCardExpiryDate() {
-        return cardExpiryDate;
-    }
-
-    public Object getTimestamp() {
-        return timestamp;
-    }
-
-    public Object getStatus() {
-        return status;
-    }
-
-    public void setTransactionId(String s) {
-        this.transactionId = transactionId;
-    }
-
+    // Custom setter to maintain bidirectional relationship
     public void setMerchant(Merchant merchant) {
-        this.merchant = merchant;
+        if (!Objects.equals(this.merchant, merchant)) {
+            if (this.merchant != null) {
+                this.merchant.getTransactions().remove(this);
+            }
+            this.merchant = merchant;
+            if (merchant != null && merchant.getTransactions() != null) {
+                merchant.getTransactions().add(this);
+            }
+        }
     }
 
-    public void setAmount(Object amount) {
-        this.amount = (BigDecimal) amount;
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public void setCardExpiryDate(String cardExpiryDate) {
-        this.cardExpiryDate = cardExpiryDate;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void setStatus(TransactionStatus transactionStatus) {
-        this.transactionStatus = transactionStatus;
-    }
 }

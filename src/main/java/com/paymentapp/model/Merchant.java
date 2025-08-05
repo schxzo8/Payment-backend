@@ -1,75 +1,65 @@
 package com.paymentapp.model;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+import java.util.ArrayList;
+
+@Setter
 @Entity
 @Table(name = "merchants")
 public class Merchant {
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @Column(name = "merchant_name", nullable = false)
     private String merchantName;
 
+    @Getter
     @Column(name = "merchant_id", unique = true, nullable = false)
     private String merchantId;
 
+    @Getter
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Getter
     @Column(name = "phone_no", nullable = false)
     private String phoneNo;
 
+    @Getter
     @Column(nullable = false)
     private String password;
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    // ADD THIS FIELD FOR TRANSACTIONS
+    @OneToMany(mappedBy = "merchant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Transaction> transactions = new ArrayList<>();
+
+    // REPLACE THE BROKEN METHOD WITH THIS:
+    public List<Transaction> getTransactions() {
+        if (transactions == null) {
+            transactions = new ArrayList<>();
+        }
+        return transactions;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    // HELPER METHODS FOR BIDIRECTIONAL RELATIONSHIP
+    public void addTransaction(Transaction transaction) {
+        if (transactions == null) {
+            transactions = new ArrayList<>();
+        }
+        transactions.add(transaction);
+        transaction.setMerchant(this);
     }
 
-    public String getMerchantName() {
-        return merchantName;
-    }
-
-    public void setMerchantName(String merchantName) {
-        this.merchantName = merchantName;
-    }
-
-    public String getMerchantId() {
-        return merchantId;
-    }
-
-    public void setMerchantId(String merchantId) {
-        this.merchantId = merchantId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNo() {
-        return phoneNo;
-    }
-
-    public void setPhoneNo(String phoneNo) {
-        this.phoneNo = phoneNo;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void removeTransaction(Transaction transaction) {
+        if (transactions != null) {
+            transactions.remove(transaction);
+            transaction.setMerchant(null);
+        }
     }
 }

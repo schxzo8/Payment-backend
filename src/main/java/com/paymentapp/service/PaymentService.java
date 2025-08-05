@@ -24,7 +24,7 @@ public class PaymentService {
     private final MerchantRepository merchantRepository;
     private final TransactionRepository transactionRepository;
     private final Random random = new Random();
-    private static final int SHIFT = 6; // Your move attribute
+    private static final int SHIFT = 6; //  move attribute for Ceaser Cypher
 
     public PaymentService(MerchantRepository merchantRepository,
                           TransactionRepository transactionRepository) {
@@ -72,12 +72,7 @@ public class PaymentService {
         return "TXN" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
     }
 
-//    private String maskCardNumber(String cardNumber) {
-//        if (cardNumber == null || cardNumber.length() < 4) {
-//            return cardNumber;
-//        }
-//        return "****-****-****-" + cardNumber.substring(cardNumber.length() - 4);
-//    }
+//Using ceaser cypher for masking the card number
 private String maskCardNumber(String cardNumber) {
     if (cardNumber == null || cardNumber.length() < 4) {
         return cardNumber;
