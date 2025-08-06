@@ -22,7 +22,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return merchant.getPassword(); // We'll add password field to Merchant later
+        return merchant.getPassword(); //
     }
 
     @Override

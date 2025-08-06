@@ -2,6 +2,7 @@ package com.paymentapp.service;
 
 import com.paymentapp.dto.LoginRequest;
 import com.paymentapp.dto.LoginResponse;
+import com.paymentapp.dto.MerchantRegistrationDto;
 import com.paymentapp.exception.AppException;
 import com.paymentapp.model.Merchant;
 import com.paymentapp.repository.MerchantRepository;
@@ -34,23 +35,30 @@ public class AuthService {
     }
 
     @Transactional
-    public void createHardcodedMerchant() {
-        if (merchantRepository.findByEmail("merchant").isEmpty()) {
-            Merchant merchant = new Merchant();
-            merchant.setMerchantName("Default Merchant");
-            merchant.setMerchantId("MERCHANT123");
-            merchant.setEmail("merchant");
-            merchant.setPhoneNo("1234567890");
-            merchant.setPassword(passwordEncoder.encode("pay123"));
-            merchantRepository.save(merchant);
+    public Merchant registerMerchant(MerchantRegistrationDto registrationDto) {
+        // Check if email already exists
+        if (merchantRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
+            throw new AppException("Email address already in use");
         }
+
+        // Check if merchant ID already exists
+        if (merchantRepository.findByMerchantId(registrationDto.getMerchantId()).isPresent()) {
+            throw new AppException("Merchant ID already in use");
+        }
+
+        // Create new merchant
+        Merchant merchant = new Merchant();
+        merchant.setMerchantName(registrationDto.getMerchantName());
+        merchant.setMerchantId(registrationDto.getMerchantId());
+        merchant.setEmail(registrationDto.getEmail());
+        merchant.setPhoneNo(registrationDto.getPhoneNo());
+        merchant.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+
+        return merchantRepository.save(merchant);
     }
 
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
         try {
-            // Initialize the hardcoded merchant if not exists
-            createHardcodedMerchant();
-
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),

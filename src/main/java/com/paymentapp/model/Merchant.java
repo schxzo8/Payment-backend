@@ -35,11 +35,11 @@ public class Merchant {
     @Column(nullable = false)
     private String password;
 
-    // ADD THIS FIELD FOR TRANSACTIONS
+    //
     @OneToMany(mappedBy = "merchant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Transaction> transactions = new ArrayList<>();
 
-    // REPLACE THE BROKEN METHOD WITH THIS:
+
     public List<Transaction> getTransactions() {
         if (transactions == null) {
             transactions = new ArrayList<>();

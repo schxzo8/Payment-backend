@@ -15,4 +15,6 @@ public class TransactionDto {
     private String cardExpiryDate;
     private LocalDateTime timestamp;
     private TransactionStatus status;
+
+
 }
